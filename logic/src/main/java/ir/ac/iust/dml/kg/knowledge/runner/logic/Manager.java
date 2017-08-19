@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class Manager implements RunnerListener {
@@ -22,7 +22,7 @@ public class Manager implements RunnerListener {
     private IJobDao jobs;
     @Autowired
     private IHistoryDao histories;
-    private final Map<String, Runner> allRunning = new HashMap<>();
+    private final Map<String, Runner> allRunning = new ConcurrentHashMap<>();
 
 
     @PostConstruct
@@ -41,9 +41,7 @@ public class Manager implements RunnerListener {
 
     public void shutdown() {
         LOGGER.info("Shutdown all");
-        synchronized (allRunning) {
-            allRunning.values().forEach(Runner::shutdown);
-        }
+        allRunning.values().forEach(Runner::shutdown);
         allRunning.values().forEach(i -> {
             try {
                 i.join();
@@ -78,7 +76,8 @@ public class Manager implements RunnerListener {
 
     @Override
     public void reportProgress(Job job, float progress) {
-        if (job.getProgress() != null) {
+        if (job.getProgress() == null || Math.abs(job.getProgress() - progress) >= 1) {
+            LOGGER.info(String.format("Progress %s", progress));
             job.setProgress(progress);
             jobs.write(job);
         } else

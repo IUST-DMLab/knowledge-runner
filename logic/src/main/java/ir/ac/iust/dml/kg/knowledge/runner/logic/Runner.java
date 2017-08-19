@@ -75,7 +75,8 @@ public class Runner extends Thread {
                         } catch (Throwable ignored) {
 
                         }
-                    history.appendOutput(line);
+                    else
+                        history.appendOutput(line);
                 }
             } catch (Exception ignored) {
             }

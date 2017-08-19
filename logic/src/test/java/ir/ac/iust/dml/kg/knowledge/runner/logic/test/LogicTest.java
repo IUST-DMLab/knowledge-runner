@@ -27,10 +27,12 @@ public class LogicTest {
     @Test
     public void testProcess() throws InterruptedException, IOException {
         final Job job = new Job("title", new ArrayList<>());
-        job.getSteps().add(new JobStep("calc.exe", "/c", "start"));
+        final JobStep step = new JobStep("java", "Sample");
+        step.setWorkingDirectory("E:\\IUST\\KnowledgeGraph\\knowledge-runner\\sample\\target\\classes");
+        job.getSteps().add(step);
         jobs.write(job);
         manager.run(job);
-        Thread.sleep(10000);
+        Thread.sleep(3000);
         manager.shutdown();
     }
 }
