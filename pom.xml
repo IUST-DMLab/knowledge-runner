@@ -12,6 +12,7 @@
 
     <modules>
         <module>access</module>
+        <module>logic</module>
         <module>services</module>
     </modules>
 

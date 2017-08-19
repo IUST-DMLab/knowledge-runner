@@ -3,7 +3,6 @@ package ir.ac.iust.dml.kg.knowledge.runner.access.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -29,8 +28,6 @@ public class Job {
     private Long endEpoch;
     @Indexed
     private JobState state;
-    @Transient //Save it on file
-    private String identifier;
 
     public Job() {
     }
@@ -107,6 +104,11 @@ public class Job {
 
     public String getIdentifier() {
         return id != null ? id.toString() : null;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Job{%s, %s}", id, title);
     }
 }
 
