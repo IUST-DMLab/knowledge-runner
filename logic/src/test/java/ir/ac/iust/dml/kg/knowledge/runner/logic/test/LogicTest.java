@@ -1,8 +1,8 @@
 package ir.ac.iust.dml.kg.knowledge.runner.logic.test;
 
-import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IJobDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Job;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.JobStep;
+import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IRunDao;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.CommandLine;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.logic.Manager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,16 +22,16 @@ public class LogicTest {
     @Autowired
     Manager manager;
     @Autowired
-    IJobDao jobs;
+    IRunDao runs;
 
     @Test
     public void testProcess() throws InterruptedException, IOException {
-        final Job job = new Job("title", new ArrayList<>());
-        final JobStep step = new JobStep("java", "Sample");
+        final Run run = new Run("title", new ArrayList<>());
+        final CommandLine step = new CommandLine("java", "Sample");
         step.setWorkingDirectory("E:\\IUST\\KnowledgeGraph\\knowledge-runner\\sample\\target\\classes");
-        job.getSteps().add(step);
-        jobs.write(job);
-        manager.run(job);
+        run.getCommands().add(step);
+        runs.write(run);
+        manager.run(run);
         Thread.sleep(3000);
         manager.shutdown();
     }

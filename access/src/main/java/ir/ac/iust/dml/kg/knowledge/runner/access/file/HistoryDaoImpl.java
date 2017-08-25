@@ -1,7 +1,7 @@
 package ir.ac.iust.dml.kg.knowledge.runner.access.file;
 
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IHistoryDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Job;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -32,27 +32,27 @@ public class HistoryDaoImpl implements IHistoryDao {
     }
 
     @Override
-    public RunHistory create(Job job) throws Exception {
+    public RunHistory create(Run run) throws Exception {
         synchronized (locks) {
-            if (locks.contains(job.getIdentifier()))
+            if (locks.contains(run.getIdentifier()))
                 throw new Exception("File is in used");
-            locks.add(job.getIdentifier());
+            locks.add(run.getIdentifier());
         }
-        final Path path1 = Paths.get(baseFile, job.getIdentifier() + ".output");
-        final Path path2 = Paths.get(baseFile, job.getIdentifier() + ".error");
+        final Path path1 = Paths.get(baseFile, run.getIdentifier() + ".output");
+        final Path path2 = Paths.get(baseFile, run.getIdentifier() + ".error");
         return new RunHistoryImpl(path1, path2);
     }
 
     @Override
-    public RunHistory read(Job job) throws IOException {
-        final Path path1 = Paths.get(baseFile, job.getIdentifier() + ".output");
-        final Path path2 = Paths.get(baseFile, job.getIdentifier() + ".error");
+    public RunHistory read(Run run) throws IOException {
+        final Path path1 = Paths.get(baseFile, run.getIdentifier() + ".output");
+        final Path path2 = Paths.get(baseFile, run.getIdentifier() + ".error");
         return new RunHistoryImpl(Files.readAllLines(path1), Files.readAllLines(path2));
     }
 
     @Override
-    public void delete(Job job) throws IOException {
-        Files.deleteIfExists(Paths.get(baseFile, job.getIdentifier() + ".output"));
-        Files.deleteIfExists(Paths.get(baseFile, job.getIdentifier() + ".error"));
+    public void delete(Run run) throws IOException {
+        Files.deleteIfExists(Paths.get(baseFile, run.getIdentifier() + ".output"));
+        Files.deleteIfExists(Paths.get(baseFile, run.getIdentifier() + ".error"));
     }
 }

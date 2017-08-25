@@ -1,10 +1,10 @@
 package ir.ac.iust.dml.kg.knowledge.runner.logic;
 
 
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Job;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.JobState;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.JobStep;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.CommandLine;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunState;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -13,31 +13,31 @@ import java.util.Map;
 
 public class Runner extends Thread {
     private final String PROGRESS_START = "#progress";
-    private final Job job;
+    private final Run run;
     private final RunnerListener listener;
     private boolean running;
     private Process current;
 
-    public Runner(Job job, RunnerListener listener) {
-        this.job = job;
+    public Runner(Run run, RunnerListener listener) {
+        this.run = run;
         this.listener = listener;
         this.running = true;
     }
 
     @Override
     public void run() {
-        try (RunHistory hist = listener.open(job)) {
+        try (RunHistory hist = listener.open(run)) {
             try {
-                listener.started(job);
-                for (JobStep step : job.getSteps())
+                listener.started(run);
+                for (CommandLine command : run.getCommands())
                     if (running) {
                         final ProcessBuilder builder = new ProcessBuilder();
-                        builder.command(step.commands());
-                        if (step.getEnvironment() != null)
-                            for (Map.Entry<String, String> entry : step.getEnvironment().entrySet())
-                                step.getEnvironment().put(entry.getKey(), entry.getValue());
-                        if (step.getWorkingDirectory() != null)
-                            builder.directory(Paths.get(step.getWorkingDirectory()).toFile());
+                        builder.command(command.commands());
+                        if (command.getEnvironment() != null)
+                            for (Map.Entry<String, String> entry : command.getEnvironment().entrySet())
+                                command.getEnvironment().put(entry.getKey(), entry.getValue());
+                        if (command.getWorkingDirectory() != null)
+                            builder.directory(Paths.get(command.getWorkingDirectory()).toFile());
                         builder.redirectErrorStream(true);
                         current = builder.start();
                         final Thread thr1 = readOutput(current, hist);
@@ -45,20 +45,20 @@ public class Runner extends Thread {
                         thr1.join();
                         thr2.join();
                         if (current.exitValue() != 0) {
-                            listener.reportStep(job, step, JobState.Failed);
-                            if (!step.isContinueOnFail()) {
-                                listener.completed(job, JobState.Failed, null);
+                            listener.command(run, command, RunState.Failed);
+                            if (!command.isContinueOnFail()) {
+                                listener.completed(run, RunState.Failed, null);
                                 return;
                             }
                         } else
-                            listener.reportStep(job, step, JobState.Succeed);
+                            listener.command(run, command, RunState.Succeed);
                     }
-                listener.completed(job, JobState.Succeed, null);
+                listener.completed(run, RunState.Succeed, null);
             } catch (Exception ex) {
-                listener.completed(job, JobState.Failed, ex);
+                listener.completed(run, RunState.Failed, ex);
             }
         } catch (Exception ex) {
-            listener.completed(job, JobState.HistoryUnavailable, ex);
+            listener.completed(run, RunState.HistoryUnavailable, ex);
         }
     }
 
@@ -71,7 +71,7 @@ public class Runner extends Thread {
                         try {
                             final String str = line.substring(PROGRESS_START.length()).trim();
                             final float progress = Float.parseFloat(str);
-                            listener.reportProgress(job, progress);
+                            listener.reportProgress(run, progress);
                         } catch (Throwable ignored) {
 
                         }

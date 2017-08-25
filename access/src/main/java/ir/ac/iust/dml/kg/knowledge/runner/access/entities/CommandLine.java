@@ -3,23 +3,23 @@ package ir.ac.iust.dml.kg.knowledge.runner.access.entities;
 import java.util.Arrays;
 import java.util.Map;
 
-public class JobStep {
+public class CommandLine {
     private String command;
     private String[] arguments;
     private Map<String, String> environment;
     private boolean continueOnFail;
     private String workingDirectory;
-    private JobState result;
+    private RunState result;
 
-    public JobStep() {
+    public CommandLine() {
     }
 
-    public JobStep(String command, String... arguments) {
+    public CommandLine(String command, String... arguments) {
         this.command = command;
         this.arguments = arguments;
     }
 
-    public JobStep(String command, String[] arguments, Map<String, String> environment) {
+    public CommandLine(String command, String[] arguments, Map<String, String> environment) {
         this.command = command;
         this.arguments = arguments;
         this.environment = environment;
@@ -74,11 +74,11 @@ public class JobStep {
         this.workingDirectory = workingDirectory;
     }
 
-    public JobState getResult() {
+    public RunState getResult() {
         return result;
     }
 
-    public void setResult(JobState result) {
+    public void setResult(RunState result) {
         this.result = result;
     }
 

@@ -13,29 +13,29 @@ import java.util.List;
  * data class for triples
  * http://194.225.227.161:8081/browse/KG-180
  */
-@XmlType(name = "Job", namespace = "http://kg.dml.iust.ac.ir")
-@Document(collection = "jobs")
-public class Job {
+@XmlType(name = "Run", namespace = "http://kg.dml.iust.ac.ir")
+@Document(collection = "runs")
+public class Run {
     @Id
     @JsonIgnore
     private ObjectId id;
     @Indexed
     private String title;
-    private List<JobStep> steps;
+    private List<CommandLine> commands;
     private long creationEpoch;
     private Long startEpoch;
     private Float progress;
     private Long endEpoch;
     @Indexed
-    private JobState state;
+    private RunState state;
 
-    public Job() {
+    public Run() {
     }
 
-    public Job(String title, List<JobStep> steps) {
+    public Run(String title, List<CommandLine> commands) {
         this.creationEpoch = System.currentTimeMillis();
         this.title = title;
-        this.steps = steps;
+        this.commands = commands;
     }
 
     public ObjectId getId() {
@@ -54,12 +54,12 @@ public class Job {
         this.title = title;
     }
 
-    public List<JobStep> getSteps() {
-        return steps;
+    public List<CommandLine> getCommands() {
+        return commands;
     }
 
-    public void setSteps(List<JobStep> steps) {
-        this.steps = steps;
+    public void setCommands(List<CommandLine> commands) {
+        this.commands = commands;
     }
 
     public long getCreationEpoch() {
@@ -94,11 +94,11 @@ public class Job {
         this.endEpoch = endEpoch;
     }
 
-    public JobState getState() {
+    public RunState getState() {
         return state;
     }
 
-    public void setState(JobState state) {
+    public void setState(RunState state) {
         this.state = state;
     }
 
@@ -108,7 +108,7 @@ public class Job {
 
     @Override
     public String toString() {
-        return String.format("Job{%s, %s}", id, title);
+        return String.format("Run{%s, %s}", id, title);
     }
 }
 

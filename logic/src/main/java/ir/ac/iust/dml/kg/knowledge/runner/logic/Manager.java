@@ -1,11 +1,11 @@
 package ir.ac.iust.dml.kg.knowledge.runner.logic;
 
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IHistoryDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IJobDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Job;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.JobState;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.JobStep;
+import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IRunDao;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.CommandLine;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunState;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Manager implements RunnerListener {
     static final Logger LOGGER = LogManager.getLogger(Manager.class);
     @Autowired
-    private IJobDao jobs;
+    private IRunDao runs;
     @Autowired
     private IHistoryDao histories;
     private final Map<String, Runner> allRunning = new ConcurrentHashMap<>();
@@ -27,14 +27,14 @@ public class Manager implements RunnerListener {
 
     @PostConstruct
     void setup() {
-//        jobs.readAllNeedForRerun().forEach(this::run);
+        runs.readAllNeedForRerun().forEach(this::run);
     }
 
-    public void run(Job job) {
+    public void run(Run run) {
         synchronized (allRunning) {
-            if (allRunning.containsKey(job.getIdentifier())) return;
-            final Runner runner = new Runner(job, this);
-            allRunning.put(job.getIdentifier(), runner);
+            if (allRunning.containsKey(run.getIdentifier())) return;
+            final Runner runner = new Runner(run, this);
+            allRunning.put(run.getIdentifier(), runner);
             runner.start();
         }
     }
@@ -51,43 +51,43 @@ public class Manager implements RunnerListener {
     }
 
     @Override
-    public RunHistory open(Job job) throws Exception {
-        return new RunHistoryWrapper(job, histories.create(job));
+    public RunHistory open(Run run) throws Exception {
+        return new RunHistoryWrapper(run, histories.create(run));
     }
 
     @Override
-    public void started(Job job) {
-        LOGGER.info(String.format("%s started", job));
-        job.setStartEpoch(System.currentTimeMillis());
-        job.setState(JobState.Running);
-        jobs.write(job);
+    public void started(Run run) {
+        LOGGER.info(String.format("%s started", run));
+        run.setStartEpoch(System.currentTimeMillis());
+        run.setState(RunState.Running);
+        runs.write(run);
     }
 
     @Override
-    public void completed(Job job, JobState state, Exception ex) {
-        LOGGER.info(String.format("%s completed with %s", job, state));
-        job.setEndEpoch(System.currentTimeMillis());
-        job.setState(state);
-        jobs.write(job);
+    public void completed(Run run, RunState state, Exception ex) {
+        LOGGER.info(String.format("%s completed with %s", run, state));
+        run.setEndEpoch(System.currentTimeMillis());
+        run.setState(state);
+        runs.write(run);
         synchronized (allRunning) {
-            allRunning.remove(job.getIdentifier());
+            allRunning.remove(run.getIdentifier());
         }
     }
 
     @Override
-    public void reportProgress(Job job, float progress) {
-        if (job.getProgress() == null || Math.abs(job.getProgress() - progress) >= 1) {
+    public void reportProgress(Run run, float progress) {
+        if (run.getProgress() == null || Math.abs(run.getProgress() - progress) >= 1) {
             LOGGER.info(String.format("Progress %s", progress));
-            job.setProgress(progress);
-            jobs.write(job);
+            run.setProgress(progress);
+            runs.write(run);
         } else
-            job.setProgress(progress);
+            run.setProgress(progress);
     }
 
     @Override
-    public void reportStep(Job job, JobStep step, JobState result) {
-        LOGGER.info(String.format("%s of %s completed with %s", step, job, result));
+    public void command(Run run, CommandLine step, RunState result) {
+        LOGGER.info(String.format("%s of %s completed with %s", step, run, result));
         step.setResult(result);
-        jobs.write(job);
+        runs.write(run);
     }
 }

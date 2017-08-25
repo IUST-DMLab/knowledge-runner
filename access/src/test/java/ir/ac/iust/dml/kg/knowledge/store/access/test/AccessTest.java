@@ -1,10 +1,10 @@
 package ir.ac.iust.dml.kg.knowledge.store.access.test;
 
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IHistoryDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IJobDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Job;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.JobState;
+import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IRunDao;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunState;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,38 +22,38 @@ public class AccessTest {
     @Autowired
     IHistoryDao historyDao;
     @Autowired
-    IJobDao jobDao;
+    IRunDao runDao;
 
     @Test
-    public void job() {
-        Job job = new Job("title", new ArrayList<>());
-        jobDao.write(job);
-        assert jobDao.readAllNeedForRerun().size() == 1;
-        job.setState(JobState.Succeed);
-        jobDao.write(job);
-        assert jobDao.readAllNeedForRerun().size() == 0;
-        jobDao.delete(job);
+    public void run() {
+        Run run = new Run("title", new ArrayList<>());
+        runDao.write(run);
+        assert runDao.readAllNeedForRerun().size() == 1;
+        run.setState(RunState.Succeed);
+        runDao.write(run);
+        assert runDao.readAllNeedForRerun().size() == 0;
+        runDao.delete(run);
     }
 
     @Test
     public void history() throws Exception {
-        final Job job = new Job("title", new ArrayList<>());
-        jobDao.write(job);
-        try (RunHistory run = historyDao.create(job)) {
-            try (RunHistory run2 = historyDao.create(job)) {
+        final Run run = new Run("title", new ArrayList<>());
+        runDao.write(run);
+        try (RunHistory hist1 = historyDao.create(run)) {
+            try (RunHistory hist2 = historyDao.create(run)) {
                 assert false;
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
 
             }
-            run.appendError("A");
-            run.appendError("B");
-            run.appendOutput("C");
+            hist1.appendError("A");
+            hist1.appendError("B");
+            hist1.appendOutput("C");
         }
 
-        try (RunHistory read = historyDao.read(job)) {
+        try (RunHistory read = historyDao.read(run)) {
             assert read.getErrorLines().size() == 2;
             assert read.getOutputLines().size() == 1;
         }
-        jobDao.delete(job);
+        runDao.delete(run);
     }
 }
