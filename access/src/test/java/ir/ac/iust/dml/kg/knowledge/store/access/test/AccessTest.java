@@ -1,7 +1,9 @@
 package ir.ac.iust.dml.kg.knowledge.store.access.test;
 
+import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IDefinitionDao;
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IHistoryDao;
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IRunDao;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Definition;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunState;
@@ -23,6 +25,8 @@ public class AccessTest {
     IHistoryDao historyDao;
     @Autowired
     IRunDao runDao;
+    @Autowired
+    IDefinitionDao definitionDao;
 
     @Test
     public void run() {
@@ -55,5 +59,21 @@ public class AccessTest {
             assert read.getOutputLines().size() == 1;
         }
         runDao.delete(run);
+    }
+
+    @Test
+    public void definition() {
+        final Definition definition = new Definition("title", new ArrayList<>());
+        definitionDao.write(definition);
+        try {
+            definitionDao.write(new Definition("title", new ArrayList<>()));
+            assert false;
+        } catch (Throwable ignored) {
+
+        }
+        assert definitionDao.readAll().size() == 1;
+        assert definitionDao.readByTitle("title") != null;
+        definitionDao.delete(definition);
+        assert definitionDao.readAll().isEmpty();
     }
 }
