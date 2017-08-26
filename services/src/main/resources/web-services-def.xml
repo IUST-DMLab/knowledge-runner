@@ -8,7 +8,7 @@
             http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
             http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     <context:annotation-config/>
-    <import resource="persistence-context.xml"/>
+    <import resource="logic-context.xml"/>
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
@@ -25,6 +25,7 @@
 
     <bean id="helloService" class="ir.ac.iust.dml.kg.knowledge.runner.services.hello.HelloServiceImpl"/>
     <bean id="definitionServices" class="ir.ac.iust.dml.kg.knowledge.runner.services.v1.impl.DefinitionServicesImpl"/>
+    <bean id="runServices" class="ir.ac.iust.dml.kg.knowledge.runner.services.v1.impl.RunServicesImpl"/>
 
     <jaxws:endpoint implementor="#helloService" address="/ws/v0">
         <jaxws:features>
@@ -36,11 +37,17 @@
             <ref bean="commonValidationFeature"/>
         </jaxws:features>
     </jaxws:endpoint>
+    <jaxws:endpoint implementor="#runServices" address="/ws/v1/runs">
+        <jaxws:features>
+            <ref bean="commonValidationFeature"/>
+        </jaxws:features>
+    </jaxws:endpoint>
 
     <jaxrs:server address="/rs">
         <jaxrs:serviceBeans>
             <ref bean="helloService"/>
-            <ref bean="definitionServices" />
+            <ref bean="definitionServices"/>
+            <ref bean="runServices"/>
         </jaxrs:serviceBeans>
         <jaxrs:features>
             <bean class="org.apache.cxf.jaxrs.swagger.Swagger2Feature"/>

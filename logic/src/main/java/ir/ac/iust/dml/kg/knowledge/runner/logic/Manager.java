@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,12 +37,13 @@ public class Manager implements RunnerListener {
         runs.readAllNeedForRerun().forEach(this::run);
     }
 
-    public void run(String title) {
+    public Run run(String title) {
         final Definition def = definitions.readByTitle(title);
-        if (def == null) return;
+        if (def == null) return null;
         final Run run = new Run(def);
         runs.write(run);
         run(run);
+        return run;
     }
 
     private void run(Run run) {
@@ -64,6 +67,15 @@ public class Manager implements RunnerListener {
             }
         });
     }
+
+    public List<Run> getAllRunning() {
+        synchronized (allRunning) {
+            final List<Run> runs = new ArrayList<>();
+            allRunning.values().forEach(r -> runs.add(r.getRun()));
+            return runs;
+        }
+    }
+
 
     @Override
     public RunHistory open(Run run) throws Exception {
@@ -89,6 +101,7 @@ public class Manager implements RunnerListener {
         synchronized (allRunning) {
             allRunning.remove(r.getIdentifier());
         }
+        if(state == RunState.Succeed) return;
         if (r.getValidUntilEpoch() != null && r.getValidUntilEpoch() > System.currentTimeMillis()) return;
         if (r.getRemindedTryCount() != null && r.getRemindedTryCount() <= 0) return;
         run(r);

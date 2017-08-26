@@ -105,4 +105,8 @@ public class Runner extends Thread {
         running = false;
         current.destroy();
     }
+
+    public Run getRun() {
+        return run;
+    }
 }

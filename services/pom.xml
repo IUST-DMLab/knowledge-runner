@@ -74,6 +74,11 @@
             <artifactId>knowlede-runner-access</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>ir.ac.iust.dml.kg.knowledge.runner</groupId>
+            <artifactId>knowlede-runner-logic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Spring boot -->
         <dependency>
