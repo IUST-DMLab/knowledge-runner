@@ -1,5 +1,6 @@
 package ir.ac.iust.dml.kg.knowledge.runner.access.file;
 
+import ir.ac.iust.dml.kg.knowledge.runner.access.HistoryIOException;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
 
 import java.io.BufferedWriter;
@@ -12,15 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RunHistoryImpl extends RunHistory {
-    final BufferedWriter pwo;
-    final BufferedWriter pwe;
+    private final BufferedWriter pwo;
+    private final BufferedWriter pwe;
 
-    RunHistoryImpl(Path pathOutput, Path pathErrors) throws IOException {
+    RunHistoryImpl(Path pathOutput, Path pathErrors) throws HistoryIOException {
         super(new ArrayList<>(), new ArrayList<>());
-        pwo = Files.newBufferedWriter(pathOutput, Charset.forName("UTF-8"),
-                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        pwe = Files.newBufferedWriter(pathErrors, Charset.forName("UTF-8"),
-                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        try {
+            pwo = Files.newBufferedWriter(pathOutput, Charset.forName("UTF-8"),
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            pwe = Files.newBufferedWriter(pathErrors, Charset.forName("UTF-8"),
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            throw new HistoryIOException(e);
+        }
+
 
     }
 
@@ -30,18 +36,29 @@ public class RunHistoryImpl extends RunHistory {
         pwe = null;
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
-    public void appendError(String error) throws Exception {
-        pwe.write(error);
-        pwe.newLine();
-        errorLines.add(error);
+    public void appendError(String error) throws HistoryIOException {
+        try {
+            pwe.write(error);
+            pwe.newLine();
+            errorLines.add(error);
+        } catch (IOException e) {
+            throw new HistoryIOException(e);
+        }
+
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
-    public void appendOutput(String output) throws Exception {
-        pwo.write(output);
-        pwo.newLine();
-        outputLines.add(output);
+    public void appendOutput(String output) throws HistoryIOException {
+        try {
+            pwo.write(output);
+            pwo.newLine();
+            outputLines.add(output);
+        } catch (IOException e) {
+            throw new HistoryIOException(e);
+        }
     }
 
     @Override

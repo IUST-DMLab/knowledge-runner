@@ -1,5 +1,6 @@
 package ir.ac.iust.dml.kg.knowledge.runner.logic;
 
+import ir.ac.iust.dml.kg.knowledge.runner.access.HistoryIOException;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
 
@@ -19,13 +20,13 @@ public class RunHistoryWrapper extends RunHistory {
     }
 
     @Override
-    public void appendError(String error) throws Exception {
+    public void appendError(String error) throws HistoryIOException {
         Manager.LOGGER.error(String.format("%s:%s", run, error));
         runHistory.appendError(error);
     }
 
     @Override
-    public void appendOutput(String output) throws Exception {
+    public void appendOutput(String output) throws HistoryIOException {
         Manager.LOGGER.info(String.format("%s:%s", run, output));
         runHistory.appendOutput(output);
     }

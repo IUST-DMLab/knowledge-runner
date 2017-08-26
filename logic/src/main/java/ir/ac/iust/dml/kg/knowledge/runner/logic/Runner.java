@@ -1,6 +1,7 @@
 package ir.ac.iust.dml.kg.knowledge.runner.logic;
 
 
+import ir.ac.iust.dml.kg.knowledge.runner.access.HistoryIOException;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.CommandLine;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
 import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
@@ -27,39 +28,40 @@ public class Runner extends Thread {
     @Override
     public void run() {
         try (RunHistory hist = listener.open(run)) {
-            try {
-                listener.started(run);
-                for (CommandLine command : run.getCommands())
-                    if (running) {
-                        final ProcessBuilder builder = new ProcessBuilder();
-                        builder.command(command.commands());
-                        if (command.getEnvironment() != null)
-                            for (Map.Entry<String, String> entry : command.getEnvironment().entrySet())
-                                command.getEnvironment().put(entry.getKey(), entry.getValue());
-                        if (command.getWorkingDirectory() != null)
-                            builder.directory(Paths.get(command.getWorkingDirectory()).toFile());
-                        builder.redirectErrorStream(true);
-                        current = builder.start();
-                        final Thread thr1 = readOutput(current, hist);
-                        final Thread thr2 = readError(current, hist);
-                        thr1.join();
-                        thr2.join();
-                        if (current.exitValue() != 0) {
-                            listener.command(run, command, RunState.Failed);
-                            if (!command.isContinueOnFail()) {
-                                listener.completed(run, RunState.Failed, null);
-                                return;
-                            }
-                        } else
-                            listener.command(run, command, RunState.Succeed);
-                    }
-                listener.completed(run, RunState.Succeed, null);
-            } catch (Exception ex) {
-                listener.completed(run, RunState.Failed, ex);
-            }
-        } catch (Exception ex) {
+            listener.started(run);
+            for (CommandLine command : run.getCommands())
+                if (running) {
+                    final ProcessBuilder builder = new ProcessBuilder();
+                    builder.command(command.commands());
+                    if (command.getEnvironment() != null)
+                        for (Map.Entry<String, String> entry : command.getEnvironment().entrySet())
+                            command.getEnvironment().put(entry.getKey(), entry.getValue());
+                    if (command.getWorkingDirectory() != null)
+                        builder.directory(Paths.get(command.getWorkingDirectory()).toFile());
+                    builder.redirectErrorStream(true);
+                    current = builder.start();
+                    final Thread thr1 = readOutput(current, hist);
+                    final Thread thr2 = readError(current, hist);
+                    thr1.join();
+                    thr2.join();
+                    if (current.exitValue() != 0) {
+                        listener.command(run, command, RunState.Failed);
+                        if (!command.isContinueOnFail()) {
+                            listener.completed(run, RunState.Failed, null);
+                            return;
+                        }
+                    } else
+                        listener.command(run, command, RunState.Succeed);
+                }
+
+        } catch (HistoryIOException ex) {
             listener.completed(run, RunState.HistoryUnavailable, ex);
+            return;
+        } catch (Exception ex) {
+            listener.completed(run, RunState.Failed, ex);
+            return;
         }
+        listener.completed(run, RunState.Succeed, null);
     }
 
     private Thread readOutput(Process process, RunHistory history) {

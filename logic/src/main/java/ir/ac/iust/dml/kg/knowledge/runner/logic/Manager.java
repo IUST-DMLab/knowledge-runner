@@ -1,11 +1,9 @@
 package ir.ac.iust.dml.kg.knowledge.runner.logic;
 
+import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IDefinitionDao;
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IHistoryDao;
 import ir.ac.iust.dml.kg.knowledge.runner.access.dao.IRunDao;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.CommandLine;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.Run;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
-import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunState;
+import ir.ac.iust.dml.kg.knowledge.runner.access.entities.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +20,31 @@ public class Manager implements RunnerListener {
     private IRunDao runs;
     @Autowired
     private IHistoryDao histories;
+    @Autowired
+    private IDefinitionDao definitions;
     private final Map<String, Runner> allRunning = new ConcurrentHashMap<>();
+    private boolean running = true;
 
 
     @PostConstruct
     void setup() {
-        runs.readAllNeedForRerun().forEach(this::run);
+        runs.readAllNeedForRerun().forEach(r -> {
+            if (r.getValidUntilEpoch() != null && r.getValidUntilEpoch() > System.currentTimeMillis()) return;
+            if (r.getRemindedTryCount() != null && r.getRemindedTryCount() <= 0) return;
+            run(r);
+        });
     }
 
-    public void run(Run run) {
+    public void run(String title) {
+        final Definition def = definitions.readByTitle(title);
+        if (def == null) return;
+        final Run run = new Run(def);
+        runs.write(run);
+        run(run);
+    }
+
+    private void run(Run run) {
+        if (!running) return;
         synchronized (allRunning) {
             if (allRunning.containsKey(run.getIdentifier())) return;
             final Runner runner = new Runner(run, this);
@@ -40,6 +54,7 @@ public class Manager implements RunnerListener {
     }
 
     public void shutdown() {
+        running = false;
         LOGGER.info("Shutdown all");
         allRunning.values().forEach(Runner::shutdown);
         allRunning.values().forEach(i -> {
@@ -60,18 +75,23 @@ public class Manager implements RunnerListener {
         LOGGER.info(String.format("%s started", run));
         run.setStartEpoch(System.currentTimeMillis());
         run.setState(RunState.Running);
+        if (run.getRemindedTryCount() != null)
+            run.setRemindedTryCount(run.getRemindedTryCount() - 1);
         runs.write(run);
     }
 
     @Override
-    public void completed(Run run, RunState state, Exception ex) {
-        LOGGER.info(String.format("%s completed with %s", run, state));
-        run.setEndEpoch(System.currentTimeMillis());
-        run.setState(state);
-        runs.write(run);
+    public void completed(Run r, RunState state, Exception ex) {
+        LOGGER.info(String.format("%s completed with %s", r, state));
+        r.setEndEpoch(System.currentTimeMillis());
+        r.setState(state);
+        runs.write(r);
         synchronized (allRunning) {
-            allRunning.remove(run.getIdentifier());
+            allRunning.remove(r.getIdentifier());
         }
+        if (r.getValidUntilEpoch() != null && r.getValidUntilEpoch() > System.currentTimeMillis()) return;
+        if (r.getRemindedTryCount() != null && r.getRemindedTryCount() <= 0) return;
+        run(r);
     }
 
     @Override

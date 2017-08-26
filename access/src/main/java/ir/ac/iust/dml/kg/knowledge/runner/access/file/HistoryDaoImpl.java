@@ -20,7 +20,6 @@ import java.util.Set;
 public class HistoryDaoImpl implements IHistoryDao {
     @Value("${history.location}")
     private String baseFile;
-    private Set<String> locks = new HashSet<>();
 
     @PostConstruct
     void setup() throws IOException {
@@ -33,11 +32,6 @@ public class HistoryDaoImpl implements IHistoryDao {
 
     @Override
     public RunHistory create(Run run) throws Exception {
-        synchronized (locks) {
-            if (locks.contains(run.getIdentifier()))
-                throw new Exception("File is in used");
-            locks.add(run.getIdentifier());
-        }
         final Path path1 = Paths.get(baseFile, run.getIdentifier() + ".output");
         final Path path2 = Paths.get(baseFile, run.getIdentifier() + ".error");
         return new RunHistoryImpl(path1, path2);

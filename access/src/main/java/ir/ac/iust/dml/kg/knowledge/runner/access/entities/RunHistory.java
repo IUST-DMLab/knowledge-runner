@@ -1,5 +1,7 @@
 package ir.ac.iust.dml.kg.knowledge.runner.access.entities;
 
+import ir.ac.iust.dml.kg.knowledge.runner.access.HistoryIOException;
+
 import java.io.Closeable;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public abstract class RunHistory implements Closeable {
         return errorLines;
     }
 
-    public abstract void appendError(String error) throws Exception;
+    public abstract void appendError(String error) throws HistoryIOException;
 
-    public abstract void appendOutput(String output) throws Exception;
+    public abstract void appendOutput(String output) throws HistoryIOException;
 }

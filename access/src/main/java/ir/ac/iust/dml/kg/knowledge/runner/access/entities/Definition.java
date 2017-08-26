@@ -19,7 +19,8 @@ public class Definition {
     private String title;
     private List<CommandLine> commands;
     private long creationEpoch;
-    private int maxTryCount;
+    private Integer maxTryCount;
+    private Long maxTryDuration;
 
     public Definition() {
     }
@@ -64,6 +65,22 @@ public class Definition {
 
     public String getIdentifier() {
         return id != null ? id.toString() : null;
+    }
+
+    public Integer getMaxTryCount() {
+        return maxTryCount;
+    }
+
+    public void setMaxTryCount(Integer maxTryCount) {
+        this.maxTryCount = maxTryCount;
+    }
+
+    public Long getMaxTryDuration() {
+        return maxTryDuration;
+    }
+
+    public void setMaxTryDuration(Long maxTryDuration) {
+        this.maxTryDuration = maxTryDuration;
     }
 
     @Override

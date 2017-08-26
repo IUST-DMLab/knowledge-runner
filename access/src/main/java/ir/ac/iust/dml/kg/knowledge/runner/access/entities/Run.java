@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.xml.bind.annotation.XmlType;
@@ -23,11 +24,15 @@ public class Run {
     private String title;
     private List<CommandLine> commands;
     private long creationEpoch;
+    private Integer remindedTryCount;
+    private Long validUntilEpoch;
     private Long startEpoch;
     private Float progress;
     private Long endEpoch;
     @Indexed
     private RunState state;
+    @DBRef
+    private Definition definition;
 
     public Run() {
     }
@@ -36,6 +41,16 @@ public class Run {
         this.creationEpoch = System.currentTimeMillis();
         this.title = title;
         this.commands = commands;
+    }
+
+    public Run(Definition def) {
+        title = def.getTitle();
+        commands = def.getCommands();
+        creationEpoch = System.currentTimeMillis();
+        remindedTryCount = def.getMaxTryCount();
+        validUntilEpoch = def.getMaxTryDuration();
+        if(validUntilEpoch != null) validUntilEpoch += System.currentTimeMillis();
+        definition = def;
     }
 
     public ObjectId getId() {
@@ -104,6 +119,30 @@ public class Run {
 
     public String getIdentifier() {
         return id != null ? id.toString() : null;
+    }
+
+    public Integer getRemindedTryCount() {
+        return remindedTryCount;
+    }
+
+    public void setRemindedTryCount(Integer remindedTryCount) {
+        this.remindedTryCount = remindedTryCount;
+    }
+
+    public Long getValidUntilEpoch() {
+        return validUntilEpoch;
+    }
+
+    public void setValidUntilEpoch(Long validUntilEpoch) {
+        this.validUntilEpoch = validUntilEpoch;
+    }
+
+    public Definition getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     @Override
