@@ -20,10 +20,14 @@ import java.util.List;
  */
 @Repository
 public class RunDaoImpl implements IRunDao {
+    private final IHistoryDao historyDao;
+    private final MongoOperations op;
+
     @Autowired
-    private IHistoryDao historyDao;
-    @Autowired
-    private MongoOperations op;
+    public RunDaoImpl(IHistoryDao historyDao, MongoOperations op) {
+        this.historyDao = historyDao;
+        this.op = op;
+    }
 
     @Override
     public void write(Run... runs) {
@@ -51,8 +55,16 @@ public class RunDaoImpl implements IRunDao {
 
     @Override
     public List<Run> readAllNeedForRerun() {
+        final long epoch = System.currentTimeMillis();
         final Query query = new Query();
-        query.addCriteria(Criteria.where("state").ne(RunState.Succeed));
+        query.addCriteria(Criteria.where("state").ne(RunState.Succeed).andOperator(
+                new Criteria().orOperator(
+                        Criteria.where("validUntilEpoch").exists(false),
+                        Criteria.where("validUntilEpoch").gt(epoch)),
+                new Criteria().orOperator(
+                        Criteria.where("remindedTryCount").exists(false),
+                        Criteria.where("remindedTryCount").gt(0)))
+        );
         return op.find(query, Run.class);
     }
 

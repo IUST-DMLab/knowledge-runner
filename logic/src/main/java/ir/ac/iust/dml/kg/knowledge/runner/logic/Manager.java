@@ -16,23 +16,23 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class Manager implements RunnerListener {
     static final Logger LOGGER = LogManager.getLogger(Manager.class);
-    @Autowired
-    private IRunDao runs;
-    @Autowired
-    private IHistoryDao histories;
-    @Autowired
-    private IDefinitionDao definitions;
+    private final IRunDao runs;
+    private final IHistoryDao histories;
+    private final IDefinitionDao definitions;
     private final Map<String, Runner> allRunning = new ConcurrentHashMap<>();
     private boolean running = true;
+
+    @Autowired
+    public Manager(IRunDao runs, IHistoryDao histories, IDefinitionDao definitions) {
+        this.runs = runs;
+        this.histories = histories;
+        this.definitions = definitions;
+    }
 
 
     @PostConstruct
     void setup() {
-        runs.readAllNeedForRerun().forEach(r -> {
-            if (r.getValidUntilEpoch() != null && r.getValidUntilEpoch() > System.currentTimeMillis()) return;
-            if (r.getRemindedTryCount() != null && r.getRemindedTryCount() <= 0) return;
-            run(r);
-        });
+        runs.readAllNeedForRerun().forEach(this::run);
     }
 
     public void run(String title) {
