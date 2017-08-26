@@ -24,8 +24,14 @@
     </bean>
 
     <bean id="helloService" class="ir.ac.iust.dml.kg.knowledge.runner.services.hello.HelloServiceImpl"/>
+    <bean id="definitionServices" class="ir.ac.iust.dml.kg.knowledge.runner.services.v1.impl.DefinitionServicesImpl"/>
 
     <jaxws:endpoint implementor="#helloService" address="/ws/v0">
+        <jaxws:features>
+            <ref bean="commonValidationFeature"/>
+        </jaxws:features>
+    </jaxws:endpoint>
+    <jaxws:endpoint implementor="#definitionServices" address="/ws/v1/definitions">
         <jaxws:features>
             <ref bean="commonValidationFeature"/>
         </jaxws:features>
@@ -34,6 +40,7 @@
     <jaxrs:server address="/rs">
         <jaxrs:serviceBeans>
             <ref bean="helloService"/>
+            <ref bean="definitionServices" />
         </jaxrs:serviceBeans>
         <jaxrs:features>
             <bean class="org.apache.cxf.jaxrs.swagger.Swagger2Feature"/>
