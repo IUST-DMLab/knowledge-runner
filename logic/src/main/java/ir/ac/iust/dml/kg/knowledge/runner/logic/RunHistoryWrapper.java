@@ -7,7 +7,11 @@ import ir.ac.iust.dml.kg.knowledge.runner.access.entities.RunHistory;
 import java.io.IOException;
 
 /**
- * Wrapper of run history to alarm history changed
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ *
+ * Wrapper of run history to inject history changed and send event to Manager
  */
 public class RunHistoryWrapper extends RunHistory {
     private final Run run;

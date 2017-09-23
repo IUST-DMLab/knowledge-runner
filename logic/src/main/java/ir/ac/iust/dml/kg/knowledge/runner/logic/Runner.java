@@ -12,6 +12,13 @@ import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.Map;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * Run a {@link Run} and read its output and errors
+ */
 public class Runner extends Thread {
     private final String PROGRESS_START = "#progress";
     private final Run run;

@@ -5,6 +5,13 @@ import ir.ac.iust.dml.kg.knowledge.runner.access.HistoryIOException;
 import java.io.Closeable;
 import java.util.List;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * History of output of process
+ */
 public abstract class RunHistory implements Closeable {
     protected final List<String> outputLines;
     protected final List<String> errorLines;

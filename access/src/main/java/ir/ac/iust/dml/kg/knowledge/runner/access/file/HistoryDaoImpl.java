@@ -12,9 +12,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * All history saved in folder of user.home
+ */
 @Repository
 @PropertySource("classpath:persistence.properties")
 public class HistoryDaoImpl implements IHistoryDao {

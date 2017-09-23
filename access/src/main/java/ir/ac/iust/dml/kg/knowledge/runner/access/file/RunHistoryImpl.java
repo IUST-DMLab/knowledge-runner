@@ -12,6 +12,13 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * Each history saved as one file
+ */
 public class RunHistoryImpl extends RunHistory {
     private final BufferedWriter pwo;
     private final BufferedWriter pwe;

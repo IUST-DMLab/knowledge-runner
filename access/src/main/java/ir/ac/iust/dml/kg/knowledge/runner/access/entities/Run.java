@@ -11,8 +11,13 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 /**
- * data class for triples
- * http://194.225.227.161:8081/browse/KG-180
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ *
+ * data class for Run
+ * A definition run multiple time
+ * Every time data stored as Run
  */
 @XmlType(name = "Run", namespace = "http://kg.dml.iust.ac.ir")
 @Document(collection = "runs")
