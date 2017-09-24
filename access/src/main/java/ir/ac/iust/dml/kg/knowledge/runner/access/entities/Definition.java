@@ -9,6 +9,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * Each definition is list of command that run sequentially
+ * Job is done if all run successfully
+ */
 @XmlType(name = "Definition", namespace = "http://kg.dml.iust.ac.ir")
 @Document(collection = "definitions")
 public class Definition {

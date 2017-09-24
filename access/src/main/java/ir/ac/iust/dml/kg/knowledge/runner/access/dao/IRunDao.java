@@ -8,7 +8,9 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 /**
- * Interface for read and write runs
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
  */
 public interface IRunDao {
     void write(Run... runs);

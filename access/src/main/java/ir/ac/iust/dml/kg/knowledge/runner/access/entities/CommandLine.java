@@ -3,6 +3,13 @@ package ir.ac.iust.dml.kg.knowledge.runner.access.entities;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * Command Line that run as java process
+ */
 public class CommandLine {
     private String command;
     private String[] arguments;

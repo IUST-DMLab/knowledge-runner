@@ -16,7 +16,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * impl {@link IRunDao}
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
  */
 @Repository
 public class RunDaoImpl implements IRunDao {

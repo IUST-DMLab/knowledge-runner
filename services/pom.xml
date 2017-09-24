@@ -25,7 +25,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <mainClass>ir.ac.iust.dml.kg.knowledge.store.services.MainApplication</mainClass>
+                    <mainClass>ir.ac.iust.dml.kg.knowledge.runner.services.MainApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -48,7 +48,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${spring.boot.version}</version>
                         <configuration>
-                            <mainClass>ir.ac.iust.dml.kg.knowledge.store.services.MainApplication</mainClass>
+                            <mainClass>ir.ac.iust.dml.kg.knowledge.runner.services.MainApplication</mainClass>
                         </configuration>
                     </plugin>
                 </plugins>

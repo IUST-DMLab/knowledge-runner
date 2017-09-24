@@ -15,6 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Farsi Knowledge Graph Project
+ * Iran University of Science and Technology (Year 2017)
+ * Developed by HosseiN Khademi khaledi
+ * <p>
+ * Main class that run definition and store data in db
+ */
 @Service
 public class Manager implements RunnerListener {
     static final Logger LOGGER = LogManager.getLogger(Manager.class);
